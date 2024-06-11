@@ -2,7 +2,7 @@
 
 ___
 
-Connect Kit Database - это оболочка для SQLAlchemy с некоторыми функциями.
+ConnectKit Database - это оболочка для SQLAlchemy с некоторыми функциями.
 
 Включает в себя pydantic settings, пользовательский json-сериализатор, шаблонный код.
 
@@ -59,7 +59,7 @@ from database.settings import settings
 settings.DB_ECHO = False
 ```
 
-**!! ВНИМАНИЕ !!**
+> **!! ВНИМАНИЕ !!**
 После создания подключения по умолчанию, изменение параметров settings для него игнорируется.
 
 Для открытия соединения используются `Database` и `AsyncDatabase` контекстные менеджеры:

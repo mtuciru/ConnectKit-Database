@@ -59,8 +59,8 @@ from database.settings import settings
 settings.DB_ECHO = False
 ```
 
-**!! Attention !!**
-After creating a default connection, changing the settings settings for it is ignored.
+> **!! Attention !!**
+After creating a default connection, changing the settings variables for it is ignored.
 
 To open a connection, the `Database` and `AsyncDatabase` context managers are used:
 
