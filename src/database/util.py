@@ -12,8 +12,12 @@ from database.settings import settings, Adapter
 
 
 def get_default_url(asyncio=False):
-    if settings.DB_ADDR is None or settings.DB_PORT is None:
-        raise errors.DatabaseSettingsRequired(f"Specify default database environment agrs")
+    if settings.DB_ADAPTER != Adapter.sqlite:
+        if settings.DB_ADDR is None or settings.DB_PORT is None:
+            raise errors.DatabaseSettingsRequired(f"Specify default database environment agrs")
+    else:
+        if settings.DB_NAME is None:
+            raise errors.DatabaseSettingsRequired(f"Specify default database environment agrs")
     return compile_url(settings.DB_ADAPTER, settings.DB_USERNAME, settings.DB_PASSWORD, settings.DB_ADDR,
                        settings.DB_PORT, settings.DB_NAME, asyncio)
 
@@ -26,6 +30,10 @@ def compile_url(adapter: Adapter, username: str, password: str, host: str, port:
         driver_name = f"mysql+{'aiomysql' if asyncio else 'mysqldb'}"
     elif adapter == Adapter.sqlite:
         driver_name = f"sqlite+{'aiosqlite' if asyncio else 'pysqlite'}"
+        username = None,
+        password = None,
+        host = None,
+        port = None,
     else:
         raise errors.DatabaseWrongAdapterError(f'Adapter "{str(adapter)}" not exists.')
     return URL.create(
