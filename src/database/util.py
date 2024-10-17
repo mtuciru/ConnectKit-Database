@@ -30,10 +30,10 @@ def compile_url(adapter: Adapter, username: str, password: str, host: str, port:
         driver_name = f"mysql+{'aiomysql' if asyncio else 'mysqldb'}"
     elif adapter == Adapter.sqlite:
         driver_name = f"sqlite+{'aiosqlite' if asyncio else 'pysqlite'}"
-        username = None,
-        password = None,
-        host = None,
-        port = None,
+        username = None
+        password = None
+        host = None
+        port = None
     else:
         raise errors.DatabaseWrongAdapterError(f'Adapter "{str(adapter)}" not exists.')
     return URL.create(
