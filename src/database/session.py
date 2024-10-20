@@ -15,6 +15,8 @@ logger = logging.getLogger("Database")
 
 @lru_cache(maxsize=10)
 def _create_engin(url: str):
+    if str(url).startswith("sqlite"):
+        return create_engine(url, json_serializer=_custom_json_dumps, echo=settings.DB_ECHO)
     return create_engine(url, json_serializer=_custom_json_dumps,
                          pool_size=3, max_overflow=22, pool_timeout=settings.DB_POOL_TIMEOUT,
                          pool_pre_ping=True, pool_use_lifo=True, echo=settings.DB_ECHO)
