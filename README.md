@@ -16,7 +16,7 @@ Three types of connectors are supported:
 -[x] MySQL (MariaDB) (sync/async)
 -[x] Sqlite3 (sync/async)
 
-By default, the DB connector package is not installed, extensions are specified for installation.
+By default, the DB connector package is not installed (exclude default sqlite), extensions are specified for installation.
 
 To install sync versions:
 

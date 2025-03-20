@@ -2,6 +2,8 @@ import enum
 from typing import Optional
 
 from pydantic_settings import BaseSettings
+from database.capability_check import (HAS_POSTGRESQL, HAS_ASYNC_POSTGRESQL,
+                                       HAS_MARIADB, HAS_ASYNC_MARIADB)
 
 
 class Adapter(enum.Enum):
@@ -22,3 +24,9 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+if settings.DB_ADAPTER == Adapter.postgresql:
+    if not (HAS_POSTGRESQL or HAS_ASYNC_POSTGRESQL):
+        raise ImportError("psycopg adapter is not installed, but required. (DB_ADAPTER == postgresql)")
+    if not (HAS_MARIADB or HAS_ASYNC_MARIADB):
+        raise ImportError("mysqlclient or aiomysql adapters are not installed, but required. (DB_ADAPTER == mysql)")

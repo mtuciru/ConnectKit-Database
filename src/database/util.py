@@ -8,6 +8,9 @@ from pydantic import BaseModel
 from sqlalchemy import URL
 
 from database import errors
+from database.capability_check import (HAS_ASYNC_SQLITE,
+                                       HAS_POSTGRESQL, HAS_ASYNC_POSTGRESQL,
+                                       HAS_MARIADB, HAS_ASYNC_MARIADB)
 from database.settings import settings, Adapter
 
 
@@ -25,10 +28,23 @@ def get_default_url(asyncio=False):
 @lru_cache()
 def compile_url(adapter: Adapter, username: str, password: str, host: str, port: int, database: str, asyncio=False):
     if adapter == Adapter.postgresql:
-        driver_name = f"postgresql+{'asyncpg' if asyncio else 'psycopg2'}"
+        if not (HAS_POSTGRESQL or HAS_ASYNC_POSTGRESQL):
+            raise ImportError("psycopg adapter is not installed, but required. (adapter == postgresql)")
+        driver_name = "postgresql+psycopg"
     elif adapter == Adapter.mysql:
+        if asyncio:
+            if not HAS_ASYNC_MARIADB:
+                raise ImportError(
+                    "aiomysql adapter is not installed, but required. (adapter == mysql)")
+        else:
+            if not HAS_MARIADB:
+                raise ImportError(
+                    "mysqlclient adapter is not installed, but required. (adapter == mysql)")
         driver_name = f"mysql+{'aiomysql' if asyncio else 'mysqldb'}"
     elif adapter == Adapter.sqlite:
+        if asyncio:
+            if not HAS_ASYNC_SQLITE:
+                raise ImportError("aiosqlite adapter is not installed, but required. (adapter == sqlite)")
         driver_name = f"sqlite+{'aiosqlite' if asyncio else 'pysqlite'}"
         username = None
         password = None
