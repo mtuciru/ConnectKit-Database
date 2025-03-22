@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessionmaker, AsyncSession
 
 import database.errors as errors
-from database.util import compile_url, get_default_url, _custom_json_dumps
+from database.util import compile_url, get_default_url, _custom_json_dumps, _custom_json_loads
 from database.settings import settings, Adapter
 
 logger = logging.getLogger("AsyncDatabase")
@@ -15,9 +15,10 @@ logger = logging.getLogger("AsyncDatabase")
 @lru_cache(maxsize=10)
 def _create_async_engin(url: str):
     if str(url).startswith("sqlite"):
-        return create_async_engine(url, json_serializer=_custom_json_dumps, echo=settings.DB_ECHO)
-    return create_async_engine(url, json_serializer=_custom_json_dumps,
-                               pool_size=3, max_overflow=22, pool_timeout=settings.DB_POOL_TIMEOUT,
+        return create_async_engine(url, json_serializer=_custom_json_dumps, json_deserializer=_custom_json_loads,
+                                   echo=settings.DB_ECHO)
+    return create_async_engine(url, json_serializer=_custom_json_dumps, json_deserializer=_custom_json_loads,
+                               pool_size=3, max_overflow=22, pool_recycle=settings.DB_POOL_RECYCLE,
                                pool_pre_ping=True, pool_use_lifo=True, echo=settings.DB_ECHO)
 
 

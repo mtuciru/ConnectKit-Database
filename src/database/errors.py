@@ -6,10 +6,6 @@ class DatabaseOverloadError(DatabaseError):
     pass
 
 
-class DatabaseSerializationError(DatabaseError):
-    pass
-
-
 class DatabaseWrongAdapterError(DatabaseError):
     pass
 

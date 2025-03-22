@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     DB_USERNAME: str = "postgres"
     DB_PASSWORD: Optional[str] = None
     DB_NAME: str = "postgres"
-    DB_POOL_TIMEOUT: Optional[int] = 1
+    DB_POOL_RECYCLE: Optional[int] = 3600
     DB_ECHO: bool = False
 
 

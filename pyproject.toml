@@ -54,6 +54,9 @@ all = [
 asyncall = [
     "ConnectKit-Database[asyncpg,aiomysql,aiosqlite]",
 ]
+orjson = [
+    "orjson>=3.10.15",
+]
 
 [build-system]
 requires = ["pdm-backend"]

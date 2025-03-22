@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine, Engine
 
 import database.errors as errors
-from database.util import compile_url, get_default_url, _custom_json_dumps
+from database.util import compile_url, get_default_url, _custom_json_dumps, _custom_json_loads
 from database.settings import settings, Adapter
 
 logger = logging.getLogger("Database")
@@ -16,9 +16,10 @@ logger = logging.getLogger("Database")
 @lru_cache(maxsize=10)
 def _create_engin(url: str):
     if str(url).startswith("sqlite"):
-        return create_engine(url, json_serializer=_custom_json_dumps, echo=settings.DB_ECHO)
-    return create_engine(url, json_serializer=_custom_json_dumps,
-                         pool_size=3, max_overflow=22, pool_timeout=settings.DB_POOL_TIMEOUT,
+        return create_engine(url, json_serializer=_custom_json_dumps, json_deserializer=_custom_json_loads,
+                             echo=settings.DB_ECHO)
+    return create_engine(url, json_serializer=_custom_json_dumps, json_deserializer=_custom_json_loads,
+                         pool_size=3, max_overflow=22, pool_timeout=settings.DB_POOL_RECYCLE,
                          pool_pre_ping=True, pool_use_lifo=True, echo=settings.DB_ECHO)
 
 

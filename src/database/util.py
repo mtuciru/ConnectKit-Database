@@ -1,5 +1,13 @@
 import enum
-import json
+
+try:
+    import orjson as json
+
+    USE_ORJSON = True
+except ImportError:
+    import json
+
+    USE_ORJSON = False
 from datetime import datetime
 from functools import lru_cache
 from typing import Any, Union
@@ -62,18 +70,41 @@ def compile_url(adapter: Adapter, username: str, password: str, host: str, port:
     )
 
 
-def _json_default(obj: Any) -> Union[str, dict]:
-    if isinstance(obj, enum.Enum):
-        return str(obj.value)
-    if isinstance(obj, datetime):
-        if obj.tzinfo is None:
-            obj = obj.astimezone()
-        return obj.isoformat()
-    if isinstance(obj, BaseModel):
-        return obj.model_dump()
-    raise errors.DatabaseSerializationError(f"Can't serialize {type(obj)}")
+if USE_ORJSON:  # Use rust json library
+    def _json_default(obj: Any) -> Union[str, dict]:
+        if isinstance(obj, datetime):
+            if obj.tzinfo is None:
+                obj = obj.astimezone()
+            return obj.isoformat()
+        if isinstance(obj, BaseModel):
+            return obj.model_dump()
+        raise TypeError(f"Can't serialize {type(obj)}")
 
 
-def _custom_json_dumps(obj, **kwargs):
-    return json.dumps(obj, **kwargs, ensure_ascii=False, allow_nan=False, indent=None, separators=(',', ':'),
-                      default=_json_default)
+    def _custom_json_dumps(obj, **kwargs):
+        return json.dumps(obj, default=_json_default, option=json.OPT_PASSTHROUGH_DATETIME)
+
+
+    def _custom_json_loads(obj, **kwargs):
+        return json.loads(obj)
+
+else:  # Use python json library
+    def _json_default(obj: Any) -> Union[str, dict]:
+        if isinstance(obj, enum.Enum):
+            return str(obj.value)
+        if isinstance(obj, datetime):
+            if obj.tzinfo is None:
+                obj = obj.astimezone()
+            return obj.isoformat()
+        if isinstance(obj, BaseModel):
+            return obj.model_dump()
+        raise TypeError(f"Can't serialize {type(obj)}")
+
+
+    def _custom_json_dumps(obj, **kwargs):
+        return json.dumps(obj, **kwargs, ensure_ascii=False, allow_nan=False, indent=None, separators=(',', ':'),
+                          default=_json_default)
+
+
+    def _custom_json_loads(obj, **kwargs):
+        return json.loads(obj, **kwargs)
