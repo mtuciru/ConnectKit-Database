@@ -1,6 +1,6 @@
 [project]
 name = "ConnectKit-Database"
-version = "2.1.0"
+version = "2.1.1"
 description = "Wrapper for connection to database"
 authors = [
     { name = "RealMetamorph", email = "andr.timchuk@yandex.ru" },
