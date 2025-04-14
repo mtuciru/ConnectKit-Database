@@ -4,23 +4,21 @@ from typing import Optional
 
 import sqlalchemy.exc
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine, Engine, MetaData
 
 import database.errors as errors
 from database.util import compile_url, get_default_url, _custom_json_dumps, _custom_json_loads
 from database.settings import settings, Adapter
-
-logger = logging.getLogger("Database")
 
 
 @lru_cache(maxsize=10)
 def _create_engin(url: str):
     if str(url).startswith("sqlite"):
         return create_engine(url, json_serializer=_custom_json_dumps, json_deserializer=_custom_json_loads,
-                             echo=settings.DB_ECHO)
+                             echo=settings.echo)
     return create_engine(url, json_serializer=_custom_json_dumps, json_deserializer=_custom_json_loads,
-                         pool_size=3, max_overflow=22, pool_timeout=settings.DB_POOL_RECYCLE,
-                         pool_pre_ping=True, pool_use_lifo=True, echo=settings.DB_ECHO)
+                         pool_size=3, max_overflow=22, pool_timeout=settings.pool_recycle,
+                         pool_pre_ping=True, pool_use_lifo=True, echo=settings.echo)
 
 
 @lru_cache(maxsize=10)
@@ -38,29 +36,34 @@ class Database:
     def __init__(self, username: Optional[str] = None, password: Optional[str] = None,
                  host: Optional[str] = None, port: Optional[int] = None, database: Optional[str] = None,
                  adapter: Optional[Adapter] = None):
+        self._logger = logging.getLogger("Database")
         if adapter is None:
-            self._maker = _get_sessionmaker(get_default_engine())
+            self.__engine = get_default_engine()
+            self._maker = _get_sessionmaker(self.__engine)
         else:
-            self._maker = _get_sessionmaker(
-                _create_engin(compile_url(adapter, username, password, host, port, database, False)))
+            self.__engine = _create_engin(compile_url(adapter, username, password, host, port, database, False))
+            self._maker = _get_sessionmaker(self.__engine)
+
+    def init_base(self, metadata: MetaData):
+        metadata.create_all(self.__engine)
 
     def __enter__(self) -> Session:
         try:
-            logger.info("Connecting to database...")
+            self._logger.info("Connecting to database...")
             self._session = self._maker()
             return self._session
         except sqlalchemy.exc.TimeoutError:
-            logger.error("Connections pool is exhausted")
+            self._logger.error("Connections pool is exhausted")
             raise errors.DatabaseOverloadError("Connections pool is exhausted")
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
-            logger.warning("Database rollback")
+            self._logger.warning("Database rollback")
             self._session.rollback()
         else:
-            logger.info("Database commit")
+            self._logger.info("Database commit")
             self._session.commit()
         self._session.close()
         self._session = None
-        logger.info("Database session closed")
+        self._logger.info("Database session closed")
         return False

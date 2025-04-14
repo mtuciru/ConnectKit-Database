@@ -16,23 +16,33 @@ Three types of connectors are supported:
 -[x] MySQL (MariaDB) (sync/async)
 -[x] Sqlite3 (sync/async)
 
-By default, the DB connector package is not installed (exclude default sqlite), extensions are specified for installation.
+By default, the DB connector package is not installed (exclude built-in sqlite3), extras are specified for installation.
 
 To install sync versions:
 
 ```shell
-pip install ConnectKit-Database[postgresql]  # Установка коннектора PostgreSQL
-pip install ConnectKit-Database[mysql]       # Установка коннектора MySQL/MariaDB
-pip install ConnectKit-Database[all]         # Установка всех sync коннекторов
+pip install ConnectKit-Database[postgresql]  # Install driver for PostgreSQL
+```
+```shell
+pip install ConnectKit-Database[mysql]       # Install driver for MySQL/MariaDB
+```
+```shell
+pip install ConnectKit-Database[all]         # Install all sync drivers
 ```
 
 To install async versions:
 
 ```shell
-pip install ConnectKit-Database[asyncpg]        # Установка коннектора PostgreSQL
-pip install ConnectKit-Database[aiomysql]       # Установка коннектора MySQL/MariaDB
-pip install ConnectKit-Database[aiosqlite]      # Установка коннектора Sqlite3
-pip install ConnectKit-Database[asyncall]       # Установка всех async коннекторов
+pip install ConnectKit-Database[asyncpg]        # Install driver for PostgreSQL
+```
+```shell
+pip install ConnectKit-Database[aiomysql]       # Install driver for MySQL/MariaDB
+```
+```shell
+pip install ConnectKit-Database[aiosqlite]      # Install driver for Sqlite3
+```
+```shell
+pip install ConnectKit-Database[asyncall]       # Install all async drivers
 ```
 
 ## Usage
@@ -40,27 +50,18 @@ pip install ConnectKit-Database[asyncall]       # Установка всех as
 ___
 
 Environment variables are used for connection by default.
-Variables are extracted from the environment:
+Variables are extracted from the environment or `.env` file:
 
-    DB_ADDR=  # Address for default connection to postgres or mysql(mariadb) (default: None)
-    DB_PORT=5432  # Port for default connection to postgres or mysql(mariadb)
+    DB_ADDR=               # Address for default connection to postgres or mysql(mariadb)
+    DB_PORT=5432           # Port for default connection to postgres or mysql(mariadb)
     DB_ADAPTER=postgresql  # Select default connection dialect (from postgresql, mysql and sqlite)
-    DB_USERNAME=postgres  # Username for default connection postgres or mysql(mariadb)
-    DB_PASSWORD=  # Username for default connection postgres or mysql(mariadb) (default: None)
-    DB_NAME=postgres  # Database for postgres or mysql(mariadb), filepath for sqlite
-    DB_POOL_TIMEOUT=1  # Global pool timeout for creating new session to DB
-    DB_ECHO: bool = False  # Log all sql statements (for debug purposes)
+    DB_USERNAME=postgres   # Username for default connection postgres or mysql(mariadb)
+    DB_PASSWORD=           # Password for default connection postgres or mysql(mariadb)
+    DB_NAME=postgres       # Database for postgres or mysql(mariadb), filepath for sqlite
+    DB_POOL_RECYCLE=3600   # Global pool recycle timeout for driver session
+    DB_ECHO: bool = False  # Global log all sql statements (for debug purposes)
 
-These variables can be overridden:
-
-```python
-from database.settings import settings
-
-settings.DB_ECHO = False
-```
-
-> **!! Attention !!**
-After creating a default connection, changing the settings variables for it is ignored.
+These variables are frozen.
 
 To open a connection, the `Database` and `AsyncDatabase` context managers are used:
 
@@ -101,6 +102,17 @@ from database import Base
 init_default_base(Base.metadata)
 
 await async_init_default_base(Base.metadata)
+```
+
+or via context managers:
+
+```python
+from database import Database, AsyncDatabase
+from database import Base
+
+Database().init_base(Base.metadata)
+
+await (AsyncDatabase().init_base(Base.metadata))
 ```
 
 ## License

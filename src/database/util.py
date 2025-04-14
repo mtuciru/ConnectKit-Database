@@ -23,14 +23,14 @@ from database.settings import settings, Adapter
 
 
 def get_default_url(asyncio=False):
-    if settings.DB_ADAPTER != Adapter.sqlite:
-        if settings.DB_ADDR is None or settings.DB_PORT is None:
+    if settings.adapter != Adapter.sqlite:
+        if settings.addr is None or settings.port is None:
             raise errors.DatabaseSettingsRequired(f"Specify default database environment agrs")
     else:
-        if settings.DB_NAME is None:
+        if settings.name is None:
             raise errors.DatabaseSettingsRequired(f"Specify default database environment agrs")
-    return compile_url(settings.DB_ADAPTER, settings.DB_USERNAME, settings.DB_PASSWORD, settings.DB_ADDR,
-                       settings.DB_PORT, settings.DB_NAME, asyncio)
+    return compile_url(settings.adapter, settings.username, settings.password, settings.addr,
+                       settings.port, settings.name, asyncio)
 
 
 @lru_cache()

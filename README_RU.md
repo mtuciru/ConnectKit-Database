@@ -16,13 +16,20 @@ ___
 -[x] MySQL (MariaDB) (sync/async)
 -[x] Sqlite3 (sync/async)
 
-По умолчанию, пакет коннектора к БД не устанавливаются (за исключением стандартного sqlite), для установки указываются расширения.
+По умолчанию, пакет коннектора к БД не устанавливаются (за исключением стандартного sqlite3), для установки указываются
+extra.
 
 Для установки sync версий:
 
 ```shell
 pip install ConnectKit-Database[postgresql]  # Установка коннектора PostgreSQL
+```
+
+```shell
 pip install ConnectKit-Database[mysql]       # Установка коннектора MySQL/MariaDB
+```
+
+```shell
 pip install ConnectKit-Database[all]         # Установка всех sync коннекторов
 ```
 
@@ -30,8 +37,17 @@ pip install ConnectKit-Database[all]         # Установка всех sync 
 
 ```shell
 pip install ConnectKit-Database[asyncpg]     # Установка коннектора PostgreSQL
+```
+
+```shell
 pip install ConnectKit-Database[aiomysql]    # Установка коннектора MySQL/MariaDB
+```
+
+```shell
 pip install ConnectKit-Database[aiosqlite]   # Установка коннектора Sqlite3
+```
+
+```shell
 pip install ConnectKit-Database[asyncall]    # Установка всех async коннекторов
 ```
 
@@ -40,27 +56,18 @@ pip install ConnectKit-Database[asyncall]    # Установка всех async
 ___
 
 Для подключения по умолчанию используются переменные окружения.
-Переменные извлекаются из environment:
+Переменные извлекаются из environment или файла `.env`:
 
-    DB_ADDR=  # Address for default connection to postgres or mysql(mariadb) (default: None)
-    DB_PORT=5432  # Port for default connection to postgres or mysql(mariadb)
-    DB_ADAPTER=postgresql  # Select default connection dialect (from postgresql, mysql and sqlite)
-    DB_USERNAME=postgres  # Username for default connection postgres or mysql(mariadb)
-    DB_PASSWORD=  # Username for default connection postgres or mysql(mariadb) (default: None)
-    DB_NAME=postgres  # Database for postgres or mysql(mariadb), filepath for sqlite
-    DB_POOL_TIMEOUT=1  # Global pool timeout for creating new session to DB
-    DB_ECHO: bool = False  # Log all sql statements (for debug purposes)
+    DB_ADDR=               # Адрес БД для postgres или mysql(mariadb)
+    DB_PORT=5432           # Порт для БД postgres или mysql(mariadb) ()
+    DB_ADAPTER=postgresql  # Выбор предустановленного диалекта БД (Из postgresql, mysql и sqlite)
+    DB_USERNAME=postgres   # Имя пользователя для подключения к БД postgres или mysql(mariadb)
+    DB_PASSWORD=           # Пароль пользователя для подключения к БД postgres или mysql(mariadb)
+    DB_NAME=postgres       # Название базы данных postgres или mysql(mariadb), путь к БД для sqlite
+    DB_POOL_RECYCLE=3600   # Глобальный таймаут для закрытия сессии БД.
+    DB_ECHO: bool = False  # Логирование всех запросов sql (только для целей отладки)
 
-Данные переменные можно переопределить:
-
-```python
-from database.settings import settings
-
-settings.DB_ECHO = False
-```
-
-> **!! ВНИМАНИЕ !!**
-После создания подключения по умолчанию, изменение параметров settings для него игнорируется.
+Данные переменные заморожены:
 
 Для открытия соединения используются `Database` и `AsyncDatabase` контекстные менеджеры:
 
@@ -101,6 +108,17 @@ from database import Base
 init_default_base(Base.metadata)
 
 await async_init_default_base(Base.metadata)
+```
+
+или через контекстный менеджер:
+
+```python
+from database import Database, AsyncDatabase
+from database import Base
+
+Database().init_base(Base.metadata)
+
+await (AsyncDatabase().init_base(Base.metadata))
 ```
 
 ## Лицензия
