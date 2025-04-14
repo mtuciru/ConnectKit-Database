@@ -1,6 +1,6 @@
 [project]
 name = "ConnectKit-Database"
-version = "2.2.0"
+version = "2.2.1"
 description = "Wrapper for connection to database"
 authors = [
     { name = "RealMetamorph", email = "andr.timchuk@yandex.ru" },
@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mtuciru/ConnectKit-Database"
+Homepage = "https://github.com/mtuciru/ConnectKit-Database/blob/2.2.1/README.md"
 Repository = "https://github.com/mtuciru/ConnectKit-Database.git"
 
 

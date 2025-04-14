@@ -1,4 +1,4 @@
-# ConnectKit Database [[en](./README.md)|*ru*]
+# ConnectKit Database [[en](https://github.com/mtuciru/ConnectKit-Database/blob/2.2.1/README.md)|*ru*]
 
 ___
 
@@ -125,4 +125,4 @@ await (AsyncDatabase().init_base(Base.metadata))
 
 ___
 
-ConnectKit Database распространяется под [лицензией MIT](./LICENSE).
+ConnectKit Database распространяется под [лицензией MIT](https://github.com/mtuciru/ConnectKit-Database/blob/2.2.1/LICENSE).
